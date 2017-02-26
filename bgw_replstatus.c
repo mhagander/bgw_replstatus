@@ -64,10 +64,6 @@ void bgw_replstatus_main(Datum d)
 		ereport(ERROR,
 				(errmsg("bgw_replstatus: could not set non blocking socket: %m")));
 
-	/*
-	 * Always bind to 0.0.0.0/::1
-	 * XXX: might want to make this configurable, yes.
-	 */
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
 		addr.sin_port = htons(portnum);
