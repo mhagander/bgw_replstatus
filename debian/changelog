@@ -1,3 +1,11 @@
+bgw-replstatus (1.0.1) unstable; urgency=medium
+
+  * Team upload.
+  * Use netcat to run basic functionality test on installcheck.
+  * Add copyright file and long package description.
+
+ -- Christoph Berg <myon@debian.org>  Fri, 31 Mar 2017 20:24:44 +0200
+
 bgw-replstatus (1.0.0) unstable; urgency=medium
 
   * Initial release.

@@ -1,0 +1,2 @@
+Depends: @, postgresql-server-dev-all, netcat-openbsd
+Tests: installcheck
