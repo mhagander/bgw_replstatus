@@ -1,0 +1,13 @@
+Source: bgw-replstatus
+Section: database
+Priority: extra
+Maintainer: Magnus Hagander <magnus@hagander.net>
+Build-Depends: debhelper (>= 9), postgresql-server-dev-all (>= 158~)
+Homepage: https://github.com/mhagander/bgw_replstatus
+
+Package: postgresql-PGVERSION-bgw-replstatus
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, postgresql-PGVERSION
+Description: Small PostgreSQL background worker to report wether a
+ node is a replication master or standby
+
