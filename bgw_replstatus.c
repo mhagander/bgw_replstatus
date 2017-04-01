@@ -189,12 +189,15 @@ void _PG_init(void)
 	/*
 	 * Set up our bgworker
 	 */
+	MemSet(&worker, 0, sizeof(worker));
+
 	worker.bgw_flags = BGWORKER_SHMEM_ACCESS;
 	worker.bgw_start_time = BgWorkerStart_PostmasterStart;
 	worker.bgw_restart_time = 30; /* Restart after 30 seconds -- just
 									 so we don't end up in a hard loop
 									 if something fails */
-	worker.bgw_main = bgw_replstatus_main;
+	sprintf(worker.bgw_library_name, "bgw_replstatus");
+	sprintf(worker.bgw_function_name, "bgw_replstatus_main");
 	worker.bgw_notify_pid = 0;
 	snprintf(worker.bgw_name, BGW_MAXLEN, "bgw_replstatus");
 
