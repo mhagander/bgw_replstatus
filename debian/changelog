@@ -1,3 +1,9 @@
+bgw-replstatus (1.0.2) unstable; urgency=medium
+
+  * Team upload for PostgreSQL 10.
+
+ -- Christoph Berg <myon@debian.org>  Thu, 21 Sep 2017 18:42:06 +0200
+
 bgw-replstatus (1.0.1) unstable; urgency=medium
 
   * Team upload.

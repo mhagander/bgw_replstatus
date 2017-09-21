@@ -4,7 +4,7 @@ Priority: extra
 Maintainer: Magnus Hagander <magnus@hagander.net>
 Uploaders: Debian PostgreSQL Maintainers <pkg-postgresql-public@lists.alioth.debian.org>
 Build-Depends: debhelper (>= 9), postgresql-server-dev-all (>= 158~)
-Standards-Version: 3.9.8
+Standards-Version: 4.1.0
 Homepage: https://github.com/mhagander/bgw_replstatus
 Vcs-Git: https://github.com/mhagander/bgw_replstatus.git
 Vcs-Browser: https://github.com/mhagander/bgw_replstatus
