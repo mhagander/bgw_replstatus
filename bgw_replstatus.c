@@ -96,10 +96,12 @@ long __read_max_replication_delay(int socketFd){
 	int r_len;
 	long max_repl_delay = 0;
 	r_len = read(socketFd, &buffer, sizeof(buffer));
-	if (r_len > 0) {
+	if (r_len > 0)
+	{
 		ereport(DEBUG5, (errmsg("bgw_replstatus: data read from socket %s: %m", buffer)));
 		max_repl_delay = strtol(buffer, NULL, 10);
-		if (errno == ERANGE){
+		if (errno == ERANGE)
+		{
 			ereport(ERROR, (errmsg("bgw_replstatus: range error reading max_replication_delay: %m")));
 			max_repl_delay = 0;
 			errno = 0;
@@ -289,7 +291,6 @@ void _PG_init(void)
 							   NULL,
 							   NULL,
 							   NULL);
-
 
 	if (!process_shared_preload_libraries_in_progress)
 		return;
