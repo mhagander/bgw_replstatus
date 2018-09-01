@@ -21,7 +21,8 @@ PG_FUNCTION_INFO_V1(bgw_replstatus_launch);
 
 void _PG_init(void);
 void bgw_replstatus_main(Datum d) pg_attribute_noreturn();
-long read_max_replication_delay(int socketFd);
+long read_max_replication_delay(int socketFd, int *max_sd);
+long __read_max_replication_delay(int socketFd);
 
 /* flags set by signal handlers */
 static volatile sig_atomic_t got_sigterm = false;
@@ -38,6 +39,9 @@ static const char *STATUS_NAMES[] = {
 	"MASTER", "STANDBY", "OFFLINE"
 };
 
+struct timeval timeout;
+fd_set master_set;
+
 /*
  * Perform a clean shutdown on SIGTERM. To do that, just
  * set a boolean in the sig handler and then set our own
@@ -53,7 +57,43 @@ bgw_replstatus_sigterm(SIGNAL_ARGS)
 	errno = save_errno;
 }
 
-long read_max_replication_delay(int socketFd){
+long read_max_replication_delay(int socketFd, int *max_sd_p)
+{
+	int desc_ready = 0;
+	long max_repl_delay = 0;
+	int rc = 0;
+	int max_sd = *max_sd_p;
+
+	FD_SET(socketFd, &master_set);
+	if (socketFd > max_sd)
+		max_sd = socketFd;
+
+	rc = select(max_sd + 1, &master_set, NULL, NULL, &timeout);
+
+	if (rc <= 0)
+	{
+		ereport(LOG, (errmsg("bgw_replstatus: unable to read max_replication_delay: %m")));
+		return 0;
+	}
+	desc_ready = rc;
+	for (int i=0; i <= max_sd && desc_ready > 0; ++i)
+	{
+		if (FD_ISSET(i, &master_set))
+		{
+			desc_ready -= 1;
+			max_repl_delay = __read_max_replication_delay(i);
+		}
+	}
+	FD_CLR(socketFd, &master_set);
+	if (socketFd == max_sd)
+	{
+		while (max_sd > 0 && FD_ISSET(max_sd, &master_set) == 0)
+			max_sd -= 1;
+	}
+	return max_repl_delay;
+}
+
+long __read_max_replication_delay(int socketFd){
 	char buffer[100];
 	int r_len;
 	long max_repl_delay = 0;
@@ -80,6 +120,7 @@ void bgw_replstatus_main(Datum d)
 	int enable = 1;
 	int listensocket;
 	struct sockaddr_in addr;
+	int max_sd = 0;
 
 	pqsignal(SIGTERM, bgw_replstatus_sigterm);
 
@@ -121,6 +162,11 @@ void bgw_replstatus_main(Datum d)
 		ereport(ERROR,
 				(errmsg("bgw_replstatus: could not listen on socket: %m")));
 
+	timeout.tv_sec  = 1;
+	timeout.tv_usec = 0;
+
+	FD_ZERO(&master_set);
+
 	/*
 	 * Loop forever looking for new connections. Terminate on SIGTERM,
 	 * which is sent by the postmaster when it wants us to shut down.
@@ -150,6 +196,7 @@ void bgw_replstatus_main(Datum d)
 			enum STATUS status;
 			long max_replication_delay = 0;
 			socklen_t addrsize = sizeof(addr);
+
 			int worksock = accept4(listensocket, &addr, &addrsize, SOCK_NONBLOCK);
 			if (worksock == -1)
 			{
@@ -167,7 +214,7 @@ void bgw_replstatus_main(Datum d)
 			// Attempt to read max_replication_delay from the socket
 			if (status == standby)
 			{
-				max_replication_delay = read_max_replication_delay(worksock);
+				max_replication_delay = read_max_replication_delay(worksock, &max_sd);
 				if (max_replication_delay > 0
 					&& TimestampDifferenceExceeds(GetLatestXTime(), GetCurrentTimestamp(), max_replication_delay * 1000))
 				{
@@ -189,7 +236,6 @@ void bgw_replstatus_main(Datum d)
 			{
 				ereport(LOG,
 						(errmsg("bgw_replstatus: could not close working socket: %m")));
-				continue;
 			}
 		}
 	}
