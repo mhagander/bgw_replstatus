@@ -210,6 +210,15 @@ void bgw_replstatus_main(Datum d)
 			// Check replication delay
 			if (status == standby)
 			{
+				/*
+				 * This is analogous to the following SQL query:
+				 *      SELECT
+				 *      CASE
+				 *          WHEN pg_last_xlog_receive_location() = pg_last_xlog_replay_location() THEN 0
+				 *          ELSE EXTRACT (EPOCH FROM now() - pg_last_xact_replay_timestamp())::INTEGER
+				 *      END
+				 *      AS replication_lag;
+				 */
 				XLogRecPtr replay = (int64) GetXLogReplayRecPtr(NULL);
 				XLogRecPtr receive = (int64) GetWalRcvWriteRecPtr(NULL, NULL);
 				TimestampTz xtime = GetLatestXTime();
