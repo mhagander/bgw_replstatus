@@ -72,12 +72,9 @@ long read_max_replication_delay(int socketFd, int *max_sd_p)
 		max_sd = socketFd;
 
 	rc = select(max_sd + 1, &master_set, NULL, NULL, &timeout);
-
 	if (rc <= 0)
-	{
-		ereport(LOG, (errmsg("bgw_replstatus: unable to read max_replication_delay: %m")));
 		return 0;
-	}
+
 	desc_ready = rc;
 	for (int i=0; i <= max_sd && desc_ready > 0; ++i)
 	{
@@ -109,11 +106,10 @@ long __read_max_replication_delay(int socketFd){
 			max_repl_delay = 0;
 			errno = 0;
 		}
-		ereport(LOG, (errmsg("bgw_replstatus: max_replication_delay %ld: %m", max_repl_delay)));
 	}
 	else
 	{
-		ereport(LOG, (errmsg("bgw_replstatus: unable to read max_replication_delay: %m")));
+		ereport(DEBUG5, (errmsg("bgw_replstatus: unable to read max_replication_delay")));
 	}
 	return max_repl_delay;
 }
