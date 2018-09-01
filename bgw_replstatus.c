@@ -31,11 +31,11 @@ char *bindaddr = NULL;
 int max_replication_delay = -1;
 
 enum STATUS {
-    master, standby, offline,
+	master, standby, offline,
 };
 
 static const char *STATUS_NAMES[] = {
-    "MASTER", "STANDBY", "OFFLINE"
+	"MASTER", "STANDBY", "OFFLINE"
 };
 
 /*
@@ -124,7 +124,7 @@ void bgw_replstatus_main(Datum d)
 			proc_exit(1);
 		else if (rc & WL_SOCKET_READABLE)
 		{
-		    const char *status_str;
+			const char *status_str;
 			enum STATUS status;
 			socklen_t addrsize = sizeof(addr);
 			int worksock = accept4(listensocket, &addr, &addrsize, SOCK_NONBLOCK);
@@ -135,19 +135,19 @@ void bgw_replstatus_main(Datum d)
 				continue;
 			}
 
-            status = RecoveryInProgress() ? standby : master;
-            if (!WalRcvRunning())
-            {
-                status = offline;
-            }
+			status = RecoveryInProgress() ? standby : master;
+			if (!WalRcvRunning())
+			{
+				status = offline;
+			}
 
-            if (status == standby && max_replication_delay > 0
-                && TimestampDifferenceExceeds(GetLatestXTime(), GetCurrentTimestamp(), max_replication_delay * 1000))
-            {
-                status = offline;
-            }
+			if (status == standby && max_replication_delay > 0
+				&& TimestampDifferenceExceeds(GetLatestXTime(), GetCurrentTimestamp(), max_replication_delay * 1000))
+			{
+				status = offline;
+			}
 
-            status_str = STATUS_NAMES[status];
+			status_str = STATUS_NAMES[status];
 			if (write(worksock, status_str, strlen(status_str)) != strlen(status_str))
 			{
 				ereport(LOG,
@@ -209,7 +209,7 @@ void _PG_init(void)
 							   NULL,
 							   NULL);
 
-    DefineCustomIntVariable("bgw_replstatus.max_replication_delay",
+	DefineCustomIntVariable("bgw_replstatus.max_replication_delay",
 							"Maximum replication delay to consider the server as 'up'",
 							"Maximum replication delay in seconds. A response of 'OFFLINE' will be "
 							"returned if the replication delay is above this threshold. This setting "
