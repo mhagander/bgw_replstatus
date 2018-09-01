@@ -8,8 +8,8 @@ balancer such as `haproxy`.
 When installed, a background worker will be started that listens on a
 defined TCP port (configured `bgw_replstatus.port`). Any connection to
 this port will get a TCP response back (no request necessary, response
-will be sent immediately on connect) saying either `MASTER` or
-`STANDBY` depending on the current state of the node. The connection
+will be sent immediately on connect) saying either `MASTER`,
+`STANDBY` or `OFFLINE` depending on the current state of the node. The connection
 is then automatically closed.
 
 Using a background worker like this will make polling a lot more light
@@ -89,3 +89,27 @@ backend pgcluster
 In this example all nodes are local, with postgres running on ports
 5500/5501/5502 with `bgw_replstatus` bound to ports 5400/5401/5402
 respectively.
+
+Example testing replication delay
+---------------------------------
+
+In some cases you may want to only consider a standby as 'up' if
+it's replication delay is below a certain threshold. In order to do this
+you can write the threshold to the port when connecting and
+if the replication delay is greater than the threshold the response
+will be `OFFLINE`:
+
+```
+$ echo '30' | nc localhost 5400
+STANDBY
+
+$ echo '1' | nc localhost 5400
+OFFLINE
+```
+
+Here is an example of how you would use this with haproxy:
+
+```
+tcp-check send 30
+tcp-check expect rstring MASTER|STANDBY
+```
