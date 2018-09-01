@@ -21,6 +21,7 @@ PG_FUNCTION_INFO_V1(bgw_replstatus_launch);
 
 void _PG_init(void);
 void bgw_replstatus_main(Datum d) pg_attribute_noreturn();
+long read_max_replication_delay(int socketFd);
 
 /* flags set by signal handlers */
 static volatile sig_atomic_t got_sigterm = false;
@@ -28,7 +29,6 @@ static volatile sig_atomic_t got_sigterm = false;
 /* config */
 int portnum = 5400;
 char *bindaddr = NULL;
-int max_replication_delay = -1;
 
 enum STATUS {
 	master, standby, offline,
@@ -51,6 +51,28 @@ bgw_replstatus_sigterm(SIGNAL_ARGS)
 	got_sigterm = true;
 	SetLatch(MyLatch);
 	errno = save_errno;
+}
+
+long read_max_replication_delay(int socketFd){
+	char buffer[100];
+	int r_len;
+	long max_repl_delay = 0;
+	r_len = read(socketFd, &buffer, sizeof(buffer));
+	if (r_len > 0) {
+		ereport(DEBUG5, (errmsg("bgw_replstatus: data read from socket %s: %m", buffer)));
+		max_repl_delay = strtol(buffer, NULL, 10);
+		if (errno == ERANGE){
+			ereport(ERROR, (errmsg("bgw_replstatus: range error reading max_replication_delay: %m")));
+			max_repl_delay = 0;
+			errno = 0;
+		}
+		ereport(LOG, (errmsg("bgw_replstatus: max_replication_delay %ld: %m", max_repl_delay)));
+	}
+	else
+	{
+		ereport(LOG, (errmsg("bgw_replstatus: unable to read max_replication_delay: %m")));
+	}
+	return max_repl_delay;
 }
 
 void bgw_replstatus_main(Datum d)
@@ -126,6 +148,7 @@ void bgw_replstatus_main(Datum d)
 		{
 			const char *status_str;
 			enum STATUS status;
+			long max_replication_delay = 0;
 			socklen_t addrsize = sizeof(addr);
 			int worksock = accept4(listensocket, &addr, &addrsize, SOCK_NONBLOCK);
 			if (worksock == -1)
@@ -141,10 +164,15 @@ void bgw_replstatus_main(Datum d)
 				status = offline;
 			}
 
-			if (status == standby && max_replication_delay > 0
-				&& TimestampDifferenceExceeds(GetLatestXTime(), GetCurrentTimestamp(), max_replication_delay * 1000))
+			// Attempt to read max_replication_delay from the socket
+			if (status == standby)
 			{
-				status = offline;
+				max_replication_delay = read_max_replication_delay(worksock);
+				if (max_replication_delay > 0
+					&& TimestampDifferenceExceeds(GetLatestXTime(), GetCurrentTimestamp(), max_replication_delay * 1000))
+				{
+					status = offline;
+				}
 			}
 
 			status_str = STATUS_NAMES[status];
@@ -208,21 +236,6 @@ void _PG_init(void)
 							   NULL,
 							   NULL,
 							   NULL);
-
-	DefineCustomIntVariable("bgw_replstatus.max_replication_delay",
-							"Maximum replication delay to consider the server as 'up'",
-							"Maximum replication delay in seconds. A response of 'OFFLINE' will be "
-							"returned if the replication delay is above this threshold. This setting "
-							"is only applicable if the server is in recovery mode. Set to '-1' to disable.",
-							&max_replication_delay,
-							-1,
-							-1,
-							3600,
-							PGC_POSTMASTER,
-							0,
-							NULL,
-							NULL,
-							NULL);
 
 
 	if (!process_shared_preload_libraries_in_progress)
