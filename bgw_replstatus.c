@@ -30,6 +30,14 @@ int portnum = 5400;
 char *bindaddr = NULL;
 int max_replication_delay = -1;
 
+enum STATUS {
+    master, standby, offline,
+};
+
+static const char *STATUS_NAMES[] = {
+    "MASTER", "STANDBY", "OFFLINE"
+};
+
 /*
  * Perform a clean shutdown on SIGTERM. To do that, just
  * set a boolean in the sig handler and then set our own
@@ -116,7 +124,8 @@ void bgw_replstatus_main(Datum d)
 			proc_exit(1);
 		else if (rc & WL_SOCKET_READABLE)
 		{
-			char *status_str;
+		    const char *status_str;
+			enum STATUS status;
 			socklen_t addrsize = sizeof(addr);
 			int worksock = accept4(listensocket, &addr, &addrsize, SOCK_NONBLOCK);
 			if (worksock == -1)
@@ -126,18 +135,19 @@ void bgw_replstatus_main(Datum d)
 				continue;
 			}
 
-            status_str = RecoveryInProgress() ? "STANDBY" : "MASTER";
+            status = RecoveryInProgress() ? standby : master;
             if (!WalRcvRunning())
             {
-                status_str = "OFFLINE";
+                status = offline;
             }
 
-            if (strncmp(status_str, "MASTER", 6) == 0 && max_replication_delay > 0
+            if (status == standby && max_replication_delay > 0
                 && TimestampDifferenceExceeds(GetLatestXTime(), GetCurrentTimestamp(), max_replication_delay * 1000))
             {
-                status_str = "OFFLINE";
+                status = offline;
             }
 
+            status_str = STATUS_NAMES[status];
 			if (write(worksock, status_str, strlen(status_str)) != strlen(status_str))
 			{
 				ereport(LOG,
