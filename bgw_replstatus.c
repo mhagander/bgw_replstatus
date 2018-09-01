@@ -72,16 +72,16 @@ long read_max_replication_delay(int socketFd, int *max_sd_p)
 		max_sd = socketFd;
 
 	rc = select(max_sd + 1, &master_set, NULL, NULL, &timeout);
-	if (rc <= 0)
-		return 0;
-
-	desc_ready = rc;
-	for (int i=0; i <= max_sd && desc_ready > 0; ++i)
+	if (rc > 0)
 	{
-		if (FD_ISSET(i, &master_set))
+		desc_ready = rc;
+		for (int i=0; i <= max_sd && desc_ready > 0; ++i)
 		{
-			desc_ready -= 1;
-			max_repl_delay = __read_max_replication_delay(i);
+			if (FD_ISSET(i, &master_set))
+			{
+				desc_ready -= 1;
+				max_repl_delay = __read_max_replication_delay(i);
+			}
 		}
 	}
 	FD_CLR(socketFd, &master_set);
