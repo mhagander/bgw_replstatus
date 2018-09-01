@@ -1,3 +1,10 @@
+bgw-replstatus (1.0.3) unstable; urgency=medium
+
+  * Check that WAL Reciever process is running on standby
+  * Read 'max_replication_delay' from client and use it to update response
+
+ -- Simon Kelly <simongdkelly@gmail.com>  Sat, 01 Sept 2018 16:58:14 +0200
+
 bgw-replstatus (1.0.2) unstable; urgency=medium
 
   * Team upload for PostgreSQL 10.
