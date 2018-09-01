@@ -1,3 +1,5 @@
+#include "stdio.h"
+#include "string.h"
 #include "postgres.h"
 
 #include "miscadmin.h"
@@ -7,6 +9,8 @@
 #include "access/xlog.h"
 #include "utils/guc.h"
 #include "pgstat.h"
+#include "utils/timestamp.h"
+#include "replication/walreceiver.h"
 
 #include <unistd.h>
 #include <arpa/inet.h>
@@ -24,6 +28,7 @@ static volatile sig_atomic_t got_sigterm = false;
 /* config */
 int portnum = 5400;
 char *bindaddr = NULL;
+int max_replication_delay = -1;
 
 /*
  * Perform a clean shutdown on SIGTERM. To do that, just
@@ -121,7 +126,18 @@ void bgw_replstatus_main(Datum d)
 				continue;
 			}
 
-			status_str = RecoveryInProgress() ? "STANDBY" : "MASTER";
+            status_str = RecoveryInProgress() ? "STANDBY" : "MASTER";
+            if (!WalRcvRunning())
+            {
+                status_str = "OFFLINE";
+            }
+
+            if (strncmp(status_str, "MASTER", 6) == 0 && max_replication_delay > 0
+                && TimestampDifferenceExceeds(GetLatestXTime(), GetCurrentTimestamp(), max_replication_delay * 1000))
+            {
+                status_str = "OFFLINE";
+            }
+
 			if (write(worksock, status_str, strlen(status_str)) != strlen(status_str))
 			{
 				ereport(LOG,
@@ -182,6 +198,22 @@ void _PG_init(void)
 							   NULL,
 							   NULL,
 							   NULL);
+
+    DefineCustomIntVariable("bgw_replstatus.max_replication_delay",
+							"Maximum replication delay to consider the server as 'up'",
+							"Maximum replication delay in seconds. A response of 'OFFLINE' will be "
+							"returned if the replication delay is above this threshold. This setting "
+							"is only applicable if the server is in recovery mode. Set to '-1' to disable.",
+							&max_replication_delay,
+							-1,
+							-1,
+							3600,
+							PGC_POSTMASTER,
+							0,
+							NULL,
+							NULL,
+							NULL);
+
 
 	if (!process_shared_preload_libraries_in_progress)
 		return;
