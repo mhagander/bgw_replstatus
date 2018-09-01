@@ -211,14 +211,27 @@ void bgw_replstatus_main(Datum d)
 				status = offline;
 			}
 
-			// Attempt to read max_replication_delay from the socket
+			// Check replication delay
 			if (status == standby)
 			{
-				max_replication_delay = read_max_replication_delay(worksock, &max_sd);
-				if (max_replication_delay > 0
-					&& TimestampDifferenceExceeds(GetLatestXTime(), GetCurrentTimestamp(), max_replication_delay * 1000))
+				XLogRecPtr replay = (int64) GetXLogReplayRecPtr(NULL);
+				XLogRecPtr receive = (int64) GetWalRcvWriteRecPtr(NULL, NULL);
+				TimestampTz xtime = GetLatestXTime();
+
+				ereport(DEBUG5, (errmsg("bgw_replstatus: pg_last_wal_replay_lsn %lu", replay)));
+				ereport(DEBUG5, (errmsg("bgw_replstatus: pg_last_wal_receive_lsn %lu", receive)));
+
+				if (replay != receive && xtime != 0)
 				{
-					status = offline;
+					max_replication_delay = read_max_replication_delay(worksock, &max_sd);
+					if (max_replication_delay > 0)
+					{
+						TimestampTz diff_s = (long) (GetCurrentTimestamp() - xtime) / USECS_PER_SEC;
+						ereport(DEBUG5,
+							(errmsg("bgw_replstatus: actual delay %lu : max allowed %li",
+									diff_s, max_replication_delay)));
+						status = (diff_s > max_replication_delay) ? offline : standby;
+					}
 				}
 			}
 
