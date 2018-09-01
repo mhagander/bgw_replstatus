@@ -136,7 +136,7 @@ void bgw_replstatus_main(Datum d)
 			}
 
 			status = RecoveryInProgress() ? standby : master;
-			if (!WalRcvRunning())
+			if (status == standby && !WalRcvRunning())
 			{
 				status = offline;
 			}
