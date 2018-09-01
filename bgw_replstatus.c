@@ -39,7 +39,6 @@ static const char *STATUS_NAMES[] = {
 	"MASTER", "STANDBY", "OFFLINE"
 };
 
-struct timeval timeout;
 fd_set master_set;
 
 /*
@@ -63,6 +62,10 @@ long read_max_replication_delay(int socketFd, int *max_sd_p)
 	long max_repl_delay = 0;
 	int rc = 0;
 	int max_sd = *max_sd_p;
+	struct timeval timeout;
+
+	timeout.tv_sec  = 0;
+	timeout.tv_usec = 0.1 * USECS_PER_SEC;
 
 	FD_SET(socketFd, &master_set);
 	if (socketFd > max_sd)
@@ -161,9 +164,6 @@ void bgw_replstatus_main(Datum d)
 	if (listen(listensocket, 5) != 0)
 		ereport(ERROR,
 				(errmsg("bgw_replstatus: could not listen on socket: %m")));
-
-	timeout.tv_sec  = 1;
-	timeout.tv_usec = 0;
 
 	FD_ZERO(&master_set);
 
