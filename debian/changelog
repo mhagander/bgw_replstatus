@@ -1,10 +1,11 @@
-bgw-replstatus (1.0.3) UNRELEASED; urgency=medium
+bgw-replstatus (1.0.3) unstable; urgency=medium
 
+  * Team upload for PostgreSQL 11.
   * Priority: optional.
   * Update PostgreSQL team address.
   * Bump S-V.
 
- -- Christoph Berg <myon@debian.org>  Thu, 11 Oct 2018 22:11:39 +0200
+ -- Christoph Berg <myon@debian.org>  Thu, 11 Oct 2018 22:15:39 +0200
 
 bgw-replstatus (1.0.2) unstable; urgency=medium
 
