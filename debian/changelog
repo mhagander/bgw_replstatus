@@ -1,6 +1,7 @@
 bgw-replstatus (1.0.3) UNRELEASED; urgency=medium
 
   * Priority: optional.
+  * Update PostgreSQL team address.
 
  -- Christoph Berg <myon@debian.org>  Thu, 11 Oct 2018 22:11:39 +0200
 
