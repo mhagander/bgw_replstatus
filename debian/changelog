@@ -1,3 +1,9 @@
+bgw-replstatus (1.0.5) UNRELEASED; urgency=medium
+
+  * Use secure copyright file specification URI.
+
+ -- Debian Janitor <janitor@jelmer.uk>  Tue, 28 Apr 2020 15:19:48 +0000
+
 bgw-replstatus (1.0.4) unstable; urgency=medium
 
   * Team upload for PostgreSQL 12.
