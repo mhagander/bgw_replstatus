@@ -2,6 +2,7 @@ bgw-replstatus (1.0.5) UNRELEASED; urgency=medium
 
   * Use secure copyright file specification URI.
   * Bump debhelper from deprecated 9 to 12.
+  * Set debhelper-compat version in Build-Depends.
 
  -- Debian Janitor <janitor@jelmer.uk>  Tue, 28 Apr 2020 15:19:48 +0000
 
