@@ -3,7 +3,7 @@ Section: database
 Priority: optional
 Maintainer: Magnus Hagander <magnus@hagander.net>
 Uploaders: Debian PostgreSQL Maintainers <team+postgresql@tracker.debian.org>
-Build-Depends: debhelper (>= 9), postgresql-server-dev-all (>= 158~)
+Build-Depends: debhelper (>= 12~), postgresql-server-dev-all (>= 158~)
 Standards-Version: 4.2.0
 Homepage: https://github.com/mhagander/bgw_replstatus
 Vcs-Git: https://github.com/mhagander/bgw_replstatus.git
