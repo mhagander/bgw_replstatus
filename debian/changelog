@@ -1,11 +1,21 @@
-bgw-replstatus (1.0.5) UNRELEASED; urgency=medium
+bgw-replstatus (1.0.5) unstable; urgency=medium
 
+  [ Debian Janitor ]
   * Use secure copyright file specification URI.
   * Bump debhelper from deprecated 9 to 12.
   * Set debhelper-compat version in Build-Depends.
   * Update standards version to 4.2.1, no changes needed.
 
- -- Debian Janitor <janitor@jelmer.uk>  Tue, 28 Apr 2020 15:19:48 +0000
+  [ Christoph Berg ]
+  * Upload for PostgreSQL 13.
+  * Use dh --with pgxs.
+  * Build-depend on netcat-openbsd and run tests at build time as well.
+  * DH 13.
+  * R³: no.
+  * debian/tests: Use 'make' instead of postgresql-server-dev-all.
+  * Add myself to uploaders.
+
+ -- Christoph Berg <myon@debian.org>  Sun, 18 Oct 2020 21:51:33 +0200
 
 bgw-replstatus (1.0.4) unstable; urgency=medium
 

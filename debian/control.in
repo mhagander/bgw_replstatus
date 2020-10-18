@@ -2,9 +2,14 @@ Source: bgw-replstatus
 Section: database
 Priority: optional
 Maintainer: Magnus Hagander <magnus@hagander.net>
-Uploaders: Debian PostgreSQL Maintainers <team+postgresql@tracker.debian.org>
-Build-Depends: debhelper-compat (= 12), postgresql-server-dev-all (>= 158~)
-Standards-Version: 4.2.1
+Uploaders: Debian PostgreSQL Maintainers <team+postgresql@tracker.debian.org>,
+ Christoph Berg <myon@debian.org>,
+Build-Depends:
+ debhelper-compat (= 13),
+ netcat-openbsd,
+ postgresql-all (>= 217~),
+Standards-Version: 4.5.0
+Rules-Requires-Root: no
 Homepage: https://github.com/mhagander/bgw_replstatus
 Vcs-Git: https://github.com/mhagander/bgw_replstatus.git
 Vcs-Browser: https://github.com/mhagander/bgw_replstatus
