@@ -1,4 +1,4 @@
-bgw-replstatus (1.0.6) unstable; urgency=medium
+bgw-replstatus (1.0.6-1) unstable; urgency=medium
 
   * Upload for PostgreSQL 14.
 
