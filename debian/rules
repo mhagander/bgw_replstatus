@@ -4,7 +4,7 @@ override_dh_installdocs:
 	dh_installdocs --all README.*
 
 override_dh_pgxs_test:
-	pg_buildext -o 'shared_preload_libraries=bgw_replstatus' installcheck . . postgresql-%v-bgw-replstatus
+	+pg_buildext -o 'shared_preload_libraries=bgw_replstatus' installcheck . . postgresql-%v-bgw-replstatus
 
 %:
 	dh $@ --with pgxs
