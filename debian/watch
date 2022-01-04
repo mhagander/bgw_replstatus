@@ -1,2 +1,2 @@
 version=4
-https://github.com/mhagander/bgw_replstatus/releases .*/([0-9.]+).tar.gz
+https://github.com/mhagander/bgw_replstatus/tags .*/([0-9.]+).tar.gz
