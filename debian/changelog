@@ -1,3 +1,9 @@
+bgw-replstatus (1.0.7-1) unstable; urgency=medium
+
+  * Mark bgw_replstatus_main extern PGDLLEXPORT so PG16 can find it.
+
+ -- Christoph Berg <myon@debian.org>  Sun, 02 Jul 2023 23:00:08 +0200
+
 bgw-replstatus (1.0.6-3) unstable; urgency=medium
 
   * Upload for PostgreSQL 15.
