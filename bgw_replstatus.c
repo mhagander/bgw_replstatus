@@ -13,10 +13,8 @@
 
 PG_MODULE_MAGIC;
 
-PG_FUNCTION_INFO_V1(bgw_replstatus_launch);
-
 void _PG_init(void);
-void bgw_replstatus_main(Datum d) pg_attribute_noreturn();
+extern PGDLLEXPORT void bgw_replstatus_main(Datum d) pg_attribute_noreturn();
 
 /* flags set by signal handlers */
 static volatile sig_atomic_t got_sigterm = false;
