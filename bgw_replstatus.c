@@ -20,8 +20,8 @@ extern PGDLLEXPORT void bgw_replstatus_main(Datum d);
 static volatile sig_atomic_t got_sigterm = false;
 
 /* config */
-int portnum = 5400;
-char *bindaddr = NULL;
+static int portnum = 5400;
+static char *bindaddr = NULL;
 
 /*
  * Perform a clean shutdown on SIGTERM. To do that, just
