@@ -6,23 +6,24 @@ Uploaders:
  Debian PostgreSQL Maintainers <team+postgresql@tracker.debian.org>,
  Christoph Berg <myon@debian.org>,
 Build-Depends:
- architecture-is-64-bit <!pkg.postgresql.32-bit>,
  debhelper-compat (= 13),
+ architecture-is-64-bit <!pkg.postgresql.32-bit>,
  netcat-openbsd,
  postgresql-all <!nocheck>,
  postgresql-server-dev-all (>= 217~),
-Standards-Version: 4.7.0
-Rules-Requires-Root: no
+Standards-Version: 4.7.2
 Homepage: https://github.com/mhagander/bgw_replstatus
 Vcs-Git: https://github.com/mhagander/bgw_replstatus.git
 Vcs-Browser: https://github.com/mhagander/bgw_replstatus
 
-Package: postgresql-17-bgw-replstatus
+Package: postgresql-18-bgw-replstatus
 Architecture: any
 Depends:
  ${misc:Depends},
  ${postgresql:Depends},
  ${shlibs:Depends},
+Breaks:
+ ${postgresql:Breaks},
 Description: report whether PostgreSQL node is master or standby
  bgw_replstatus is a tiny PostgreSQL background worker to cheaply report the
  replication status of a node. It's intended to be polled by a load balancer

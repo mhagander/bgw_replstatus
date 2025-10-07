@@ -1,3 +1,11 @@
+bgw-replstatus (1.0.8-2) unstable; urgency=medium
+
+  * Upload for PostgreSQL 18.
+  * Add ${postgresql:Breaks}.
+  * debian/tests: Depend on postgresql-common-dev instead of 'make'.
+
+ -- Christoph Berg <myon@debian.org>  Tue, 07 Oct 2025 18:13:21 +0200
+
 bgw-replstatus (1.0.8-1) unstable; urgency=medium
 
   * Support PostgreSQL 18.
