@@ -1,3 +1,10 @@
+bgw-replstatus (1.0.8-3) unstable; urgency=medium
+
+  * Upload for PostgreSQL 19.
+  * Copyright overhaul.
+
+ -- Christoph Berg <myon@debian.org>  Wed, 25 Nov 2026 09:50:30 +0100
+
 bgw-replstatus (1.0.8-2) unstable; urgency=medium
 
   * Upload for PostgreSQL 18.

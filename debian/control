@@ -11,12 +11,12 @@ Build-Depends:
  netcat-openbsd,
  postgresql-all <!nocheck>,
  postgresql-server-dev-all (>= 217~),
-Standards-Version: 4.7.2
+Standards-Version: 4.7.4
 Homepage: https://github.com/mhagander/bgw_replstatus
 Vcs-Git: https://github.com/mhagander/bgw_replstatus.git
 Vcs-Browser: https://github.com/mhagander/bgw_replstatus
 
-Package: postgresql-18-bgw-replstatus
+Package: postgresql-19-bgw-replstatus
 Architecture: any
 Depends:
  ${misc:Depends},
